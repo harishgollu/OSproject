@@ -16,11 +16,11 @@ int main()
 	cout<<"Lowest priority range\t\t1-10\t\t(FIFO)\n";
 	cout<<"Middle priority range\t\t11-20\t\t(Priority Sheduling)\n";
 	cout<<"Highest priority range\t\t21-30\t\t(Round Robin Sheduling Time quantam=4)\n\n";
-	cout<<"NOTE: Highest priority for 1 and least priority for 30\n\n";
+	cout<<"NOTE: CPU cant be idle and Highest priority for 1 and least priority for 30\n\n";
 	int n;
 	cout<<"Enter how many Process do you want :";
 	cin>>n;
-	int p[n],burst[n],arr[i];
+	int p[n],burst[n],arr[n];
 	struct Processes obj1[n],obj2[n],obj3[n];
 	for(int i=0;i<n;i++)
 	{
@@ -34,7 +34,7 @@ int main()
 	k[1]=0;k[2]=0;k[3]=0;
 	for(int i=0;i<n;i++)
 	{
-		 if(p[i]<=10&&p[i]>=1)
+		 if(p[i]<=10&&p[i]>0)
 		      { 
 			  obj1[k[1]].processid=i+1;
 		      obj1[k[1]].priority=p[i];
@@ -59,6 +59,7 @@ int main()
 		      k[3]++;
 			  }     
 	}
+	cout<<arr[0];
 	cout<<"\nQ1---Lowest priority range Queue ("<<k[1]<<" Process)\t(FIFO)\n";
 	if(k[1]==0)
 		cout<<"No process in this priority range 0-5\n\n";
@@ -150,13 +151,9 @@ int main()
 		    		         }
 				             }
 				}	
-				
-	for(int j=0;j<k[1];j++)
-		{
-		 	cout<<obj1[j].processid<<"\t"<<obj1[j].priority<<"\t\t"<<obj1[j].arrival<<"\t"<<obj1[j].burstT<<"\n";
-		}			
+						
 	cout<<"\n\nSHEDULING :\n\n";
-	while(1)
+	while(t<=100)
 	{		
     if(Q[imp]==0)
 	{
