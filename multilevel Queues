@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<iostream>
+#include<unistd.h>
 using namespace std;
 void result();
 struct Processes
@@ -8,19 +9,20 @@ struct Processes
 	int priority;
 	int burstT;
 	int arrival;
+	int waittime;
 };
 int main()
 {
-	int i,y,j,k[3];
-	cout<<"Range of priority\t\tLimits\n";
+	int i,y,j,k[3],g=0;
+	cout<<"Range of priority\t\tLimits\n\n";
 	cout<<"Lowest priority range\t\t1-10\t\t(FIFO)\n";
 	cout<<"Middle priority range\t\t11-20\t\t(Priority Sheduling)\n";
-	cout<<"Highest priority range\t\t21-30\t\t(Round Robin Sheduling Time quantam=4)\n\n";
-	cout<<"NOTE: CPU cant be idle and Highest priority for 1 and least priority for 30\n\n";
+	cout<<"Highest priority range\t\t21-30\t\t(Round Robin Sheduling Time quantam=4 sec)\n\n";
+	cout<<"NOTE: CPU cannot be idle and Highest priority for 1 and least priority for 30\n\n";
 	int n;
 	cout<<"Enter how many Process do you want :";
 	cin>>n;
-	int p[n],burst[n],arr[n];
+	int p[n],burst[n],arr[n],obj1save[n],obj2save[n],obj3save[n];
 	struct Processes obj1[n],obj2[n],obj3[n];
 	for(int i=0;i<n;i++)
 	{
@@ -31,6 +33,17 @@ int main()
 		cout<<"Enter Arrival Time of process :";
 		cin>>arr[i];
 	}
+	for(int y=0;y<n;y++)
+	{
+		if(arr[y]==0)
+		    g++;
+	}
+	if(g==0)
+	{
+		cout<<"\n\n\t\tCPU is idle at time 0";
+	}
+	else
+	{
 	k[1]=0;k[2]=0;k[3]=0;
 	for(int i=0;i<n;i++)
 	{
@@ -39,6 +52,7 @@ int main()
 			  obj1[k[1]].processid=i+1;
 		      obj1[k[1]].priority=p[i];
 		      obj1[k[1]].burstT=burst[i];
+		      obj1save[k[1]]=obj1[k[1]].burstT;
 		      obj1[k[1]].arrival=arr[i];
 			  k[1]++;
 			  }
@@ -47,6 +61,7 @@ int main()
 			  obj2[k[2]].processid=i+1; 
 		      obj2[k[2]].priority=p[i];
 		      obj2[k[2]].burstT=burst[i];
+		      obj2save[k[2]]=obj2[k[2]].burstT;
 		      obj2[k[2]].arrival=arr[i];
 		      k[2]++;
 			  }
@@ -55,11 +70,11 @@ int main()
 			  obj3[k[3]].processid=i+1; 
 		      obj3[k[3]].priority=p[i];
 		      obj3[k[3]].burstT=burst[i];
+		      obj2save[k[2]]=obj2[k[2]].burstT;
 		      obj3[k[3]].arrival=arr[i];
 		      k[3]++;
 			  }     
 	}
-	cout<<arr[0];
 	cout<<"\nQ1---Lowest priority range Queue ("<<k[1]<<" Process)\t(FIFO)\n";
 	if(k[1]==0)
 		cout<<"No process in this priority range 0-5\n\n";
@@ -94,7 +109,7 @@ int main()
 		}	
 	}  
 	int o=0;
-	int m,t=0,imp=0,Queuecount=0,Qsize=0,flag[k[1]],flag1[k[2]],flag2[k[3]];
+	int m,t=0,imp=0,Queuecount=0,Qsize=0,flag[k[1]],flag1[k[2]],flag2[k[3]],sig=0,sig1=0,sig2=0;
 	int Q[3];
 	 for(int m=0;m<3;m++)
     {  
@@ -103,6 +118,7 @@ int main()
     for(int m=0;m<k[1];m++)
     {  
 	    flag[m]=1;
+	    obj1[j].waittime=0;
     }
     for(int m=0;m<k[2];m++)
     {  
@@ -150,11 +166,11 @@ int main()
 		    		            	obj3[r]=c2;
 		    		         }
 				             }
-				}	
-						
+				}			
 	cout<<"\n\nSHEDULING :\n\n";
-	while(t<=100)
-	{		
+	int pro=0,pro1=0,pro2=0;
+	while(t<=90)
+	{	
     if(Q[imp]==0)
 	{
 		for(int m=0;m<3;m++)
@@ -176,7 +192,6 @@ int main()
 		case 0:
 		    {
 		    	int count=0;	
-        	    int pro=0;
         	    int e=t+10;
         	    if(k[1]==0){
         	    	Q[0]=0;
@@ -202,47 +217,53 @@ int main()
 	              }
 	              else
 	              {	
-	                   if(obj1[pro].arrival<=t)
-	                   {
-					   int QTime=10;
+	                   obj1[pro].waittime+=(t-obj1[pro].waittime);
+	                   if(obj1[pro].arrival>t)
+					   {
+					   	   sig++;
+						} 
+	                   else if(obj1[pro].arrival<=t)
+	                   {	
              		   int remtime=obj1[pro].burstT;
              		   if((t+remtime)>e && remtime>0)
              		   {
              		   	  int h=t+remtime;
 					      remtime=h-e;
 						  obj1[pro].burstT=remtime;		   
-             		   	  cout<<"\tQ1\tp"<<obj1[pro].processid<<" process from "<<t<<"---"<<e<<"\n";
+             		   	  cout<<"\tQ1\tp"<<obj1[pro].processid<<" process from "<<t<<"---"<<e<<" sec\n";
              		   	  t=e;
              		   	  break;
 						}
-             		    else if(remtime<10)
-					   {
-					     cout<<"\tQ1\tp"<<obj1[pro].processid<<" process from "<<t<<"---"<<(t+remtime)<<"\n";
+             		    else if(remtime<=10)
+					    {
+					     cout<<"\tQ1\tp"<<obj1[pro].processid<<" process from "<<t<<"---"<<(t+remtime)<<" sec\n";
 					     flag[pro]=0;
 					     t+=remtime;
 					     obj1[pro].burstT=0;
 					   }
 					   else if(remtime>10)
 					   {
-					   	  cout<<"\tQ1\tp"<<obj1[pro].processid<<" process from "<<t<<"---"<<(t+10)<<"\n";
+					   	  cout<<"\tQ1\tp"<<obj1[pro].processid<<" process from "<<t<<"---"<<(t+10)<<" sec\n";
 					   	  t=t+10;
 					      obj1[pro].burstT-=10;
-					   }    
+					   }   
              		  }
+             		  if(sig==k[1])
+             		  { break;
+					   }
+             		    sleep(1);
     					pro++;
-    					pro=pro%k[1];
+    					pro=pro%k[1];}
     					
-    			   }	
 				}
 		     }
-			break;	
 		    }
+		    break;	
 	    case 1:
 		    {
 		    	
 		    	int count=0;
 		    	 int e=t+10;
-        	  int pro1=0;
         	  if(k[2]==0){
         	  	Q[1]=0;
 			  }
@@ -267,7 +288,12 @@ int main()
 	              }
 	              else
 	              {	
-	                  if(obj2[pro1].arrival<=t)
+	                  obj2[pro1].waittime+=(t-obj2[pro1].waittime);
+	                  if(obj2[pro1].arrival>t)
+					   {
+					   	   sig1++;
+						} 
+	                  else if(obj2[pro1].arrival<=t)
 	                   {
 	                  int QTime=10;
              		   int remtime=obj2[pro1].burstT;
@@ -276,7 +302,7 @@ int main()
              		   	  int h=t+remtime;
 					      remtime=h-e;
 						  obj2[pro1].burstT=remtime;		   
-             		   	  cout<<"\tQ2\tp"<<obj2[pro1].processid<<" process from "<<t<<"---"<<e<<"\n";
+             		   	  cout<<"\tQ2\tp"<<obj2[pro1].processid<<" process from "<<t<<"---"<<e<<" sec\n";
              		   	  t=e;
              		   	  break;
              		   	
@@ -284,30 +310,34 @@ int main()
              		   
 					   else if(remtime<=10)
 					   {
-					     cout<<"\tQ2\tp"<<obj2[pro1].processid<<" process from "<<t<<"---"<<(t+remtime)<<"\n";
+					     cout<<"\tQ2\tp"<<obj2[pro1].processid<<" process from "<<t<<"---"<<(t+remtime)<<" sec\n";
 					     flag1[pro1]=0;
 					     t+=remtime;
-					     obj1[pro1].burstT=0;
+					     obj2[pro1].burstT=0;
 					   }
 					   else if(remtime>10)
 					   {
-					   	  cout<<"\tQ2\tp"<<obj2[pro1].processid<<" process from "<<t<<"---"<<(t+10)<<"\n";
+					   	  cout<<"\tQ2\tp"<<obj2[pro1].processid<<" process from "<<t<<"---"<<(t+10)<<" sec\n";
 					      obj2[pro1].burstT-=10;
 					      t=t+10;
 					   }    	    
 	              
 	              }}
+	              if(sig1==k[2])
+             		  { break;
+					   }
+	                sleep(1);
     					pro1++;
     					pro1=pro1%k[2];
     		        	}	
 			         }  
-			        break;
-		     }
+			        
+		        }
+		        break;
 		case 2:
 			{
 			  int count=0;	
          	  int e=t+10;
-        	  int pro2=0;
         	  if(k[3]==0){
         	  	Q[2]=0;
 			  }
@@ -332,6 +362,11 @@ int main()
 	              }
 	              else
 	              {	
+	                  obj3[pro2].waittime+=(t-obj3[pro2].waittime);
+	                  if(obj3[pro2].arrival>t)
+					   {
+					   	   sig2++;
+						} 
 	                    if(obj3[pro2].arrival<=t)
 	                   { 
              			int timeq=4;
@@ -341,38 +376,81 @@ int main()
 	                 		int h=t+remtime;
 	                 		remtime=h-e; 
 	                 		obj3[pro2].burstT=remtime;
-	                 		cout<<"\tQ3\tp"<<obj3[pro2].processid<<" process from "<<t<<"---"<<e<<"\n";
+	                 		cout<<"\tQ3\tp"<<obj3[pro2].processid<<" process from "<<t<<"---"<<e<<" sec\n";
 	                 		t=e;
 	                  		break;
 	           			}    
 	           			else if(remtime<=timeq)
 	            		{   	 
-	                    	cout<<"\tQ3\tp"<<obj3[pro2].processid<<" process from "<<t<<"---"<<(t+remtime)<<"\n";
+	                    	cout<<"\tQ3\tp"<<obj3[pro2].processid<<" process from "<<t<<"---"<<(t+remtime)<<" sec\n";
 	                    	t+=remtime;
 	                    	obj3[pro2].burstT=0;
 		                	flag2[pro2]=0;
 	            		}
 	                    else
 	  					{	
-	   						 cout<<"\tQ3\tp"<<obj3[pro2].processid<<" process from "<<t<<"---"<<(t+timeq)<<"\n";
+	   						 cout<<"\tQ3\tp"<<obj3[pro2].processid<<" process from "<<t<<"---"<<(t+timeq)<<" sec\n";
 	     					 obj3[pro2].burstT-=timeq;
 	     					 t+=timeq;
        					}
                         }}
+                        if(sig2==k[3])
+             		   { break;
+					   }
+                        sleep(1);
     					pro2++;
     					pro2=pro2%k[3];
+    					break;
     			}
 			} 
-			break;
 			}
+			
             
 		
 	}
    
-     }     
+     }    
 imp++;
 imp=imp%3;
 }
-cout<<"END;";
+cout<<"\n";
+for(int j=0;j<k[1];j++)
+{   
+    cout<<"\n\nQ1:p"<<obj1[j].processid<<"\n";
+    if(j!=0){
+
+		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)<<" sec\n";
+		cout<<"Turnaround time\tp"<<"= "<<((obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)+obj1save[j])<<" sec\n";
+		}
+		else{
+		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime)<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<(obj1[j].waittime+obj1save[j])<<" sec\n";}
+}
+for(int j=0;j<k[2];j++)
+{   
+    cout<<"\n\nQ2:p"<<obj2[j].processid<<"\n";
+    if(j!=0){
+
+		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<((obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)+obj2save[j])<<" sec\n";
+		}
+		else{
+		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime)<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<(obj2[j].waittime+obj2save[j])<<" sec\n";}
+}
+for(int j=0;j<k[3];j++)
+{   
+    cout<<"\n\nQ3:p"<<obj3[j].processid<<"\n";
+    if(j!=0){
+
+		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)<<" sec\n";
+		cout<<"Turnaround time\t"<<"="<<((obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)+obj3save[j])<<" sec\n";
+		}
+		else{
+		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime)<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<(obj3[j].waittime+obj3save[j])<<" sec\n";}
+}
+cout<<"End--";
 return 0;
+}
 }
