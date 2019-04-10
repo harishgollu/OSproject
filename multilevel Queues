@@ -14,10 +14,12 @@ struct Processes
 int main()
 {
 	int i,y,j,k[3],g=0;
+	float avgw=0,avgt=0;
 	cout<<"Range of priority\t\tLimits\n\n";
 	cout<<"Lowest priority range\t\t1-10\t\t(FIFO)\n";
 	cout<<"Middle priority range\t\t11-20\t\t(Priority Sheduling)\n";
-	cout<<"Highest priority range\t\t21-30\t\t(Round Robin Sheduling Time quantam=4 sec)\n\n";
+	cout<<"Highest priority range\t\t21-30\t\t(Round Robin Sheduling Time quantum=4 sec)\n\n";
+	cout<<"Round Robin with Time quantum=10 between each Queues\n\n";
 	cout<<"NOTE: CPU cannot be idle and Highest priority for 1 and least priority for 30\n\n";
 	int n;
 	cout<<"Enter how many Process do you want :";
@@ -128,7 +130,7 @@ int main()
     {  
 	    flag2[m]=1;
     }
-    struct Processes c;
+    struct Processes c;  //sorting Q2 according to the priority 
 		    	for(int u=0;u<k[2];u++)
 		    	{
 		    		for(int r=u;r<k[2];r++)
@@ -141,7 +143,7 @@ int main()
 		    		}
 				  }
 				}
-    struct Processes c1;
+    struct Processes c1;  //sorting Q1 according to the arrival time
 	for(int u=0;u<k[1];u++)
 	{
 		for(int r=u;r<k[1];r++)
@@ -154,7 +156,7 @@ int main()
 		    }
 		}
 	}
-	struct Processes c2;
+	struct Processes c2; //sorting Q2 according to the arrival time
 		    	for(int u=0;u<k[3];u++)
 		    	{
 		    		        for(int r=u;r<k[3];r++)
@@ -167,7 +169,7 @@ int main()
 		    		         }
 				             }
 				}			
-	cout<<"\n\nSHEDULING :\n\n";
+	cout<<"\n\nSHEDULING :(please wait after gantt chat to see turnaround time and waiting time of each process)\n\n";
 	int pro=0,pro1=0,pro2=0;
 	while(t<=90)
 	{	
@@ -191,6 +193,7 @@ int main()
 	{
 		case 0:
 		    {
+		    	//Lowest priority range Queue
 		    	int count=0;	
         	    int e=t+10;
         	    if(k[1]==0){
@@ -261,7 +264,7 @@ int main()
 		    break;	
 	    case 1:
 		    {
-		    	
+		    	//Middle priority range Queue
 		    	int count=0;
 		    	 int e=t+10;
         	  if(k[2]==0){
@@ -336,6 +339,7 @@ int main()
 		        break;
 		case 2:
 			{
+				//Highest priority range Queue
 			  int count=0;	
          	  int e=t+10;
         	  if(k[3]==0){
@@ -421,10 +425,15 @@ for(int j=0;j<k[1];j++)
 
 		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)<<" sec\n";
 		cout<<"Turnaround time\tp"<<"= "<<((obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)+obj1save[j])<<" sec\n";
+		avgw+=(obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival);
+		avgt+=((obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)+obj1save[j]);
 		}
 		else{
 		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<(obj1[j].waittime+obj1save[j])<<" sec\n";}
+		cout<<"Turnaround time\t"<<"= "<<(obj1[j].waittime+obj1save[j])<<" sec\n";
+		avgw+=(obj1[j].waittime);
+		avgt+=(obj1[j].waittime+obj1save[j]);
+		}
 }
 for(int j=0;j<k[2];j++)
 {   
@@ -433,10 +442,15 @@ for(int j=0;j<k[2];j++)
 
 		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)<<" sec\n";
 		cout<<"Turnaround time\t"<<"= "<<((obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)+obj2save[j])<<" sec\n";
+		avgw+=(obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival);
+		avgt+=((obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)+obj2save[j]);
 		}
 		else{
 		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<(obj2[j].waittime+obj2save[j])<<" sec\n";}
+		cout<<"Turnaround time\t"<<"= "<<(obj2[j].waittime+obj2save[j])<<" sec\n";
+		avgw+=(obj2[j].waittime);
+		avgt+=(obj2[j].waittime+obj2save[j]);
+		}
 }
 for(int j=0;j<k[3];j++)
 {   
@@ -445,12 +459,19 @@ for(int j=0;j<k[3];j++)
 
 		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)<<" sec\n";
 		cout<<"Turnaround time\t"<<"="<<((obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)+obj3save[j])<<" sec\n";
+		avgw+=(obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival);
+		avgt+=((obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)+obj3save[j]);
 		}
 		else{
 		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<(obj3[j].waittime+obj3save[j])<<" sec\n";}
+		cout<<"Turnaround time\t"<<"= "<<(obj3[j].waittime+obj3save[j])<<" sec\n";
+		avgw+=(obj3[j].waittime);
+		avgt+=(obj3[j].waittime+obj3save[j]);
+		}
 }
-cout<<"End--";
+cout<<"\nAverage waiting time : "<<(avgw/n);
+cout<<"\nAverage Turnaround time : "<<(avgt/n);
+cout<<"\n\nDone--";
 return 0;
 }
 }
