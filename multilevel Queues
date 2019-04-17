@@ -16,15 +16,21 @@ int main()
 	int i,y,j,k[3],g=0;
 	float avgw=0,avgt=0;
 	cout<<"Range of priority\t\t\tLimits\n\n";
-	cout<<"Q1-Lowest priority range\t\t1-10\t\t(FIFO)\n";
+	cout<<"Q1-Lowest priority range\t\t1-10\t\t(FIFS)\n";
 	cout<<"Q2-Middle priority range\t\t11-20\t\t(Priority Sheduling) priority increases from  11 to 20\n";
 	cout<<"Q3-Highest priority range\t\t21-30\t\t(Round Robin Sheduling Time quantum=4 sec)\n\n";
 	cout<<"Round Robin with Time quantum=10 between each Queues\n\n";
-	cout<<"NOTE: CPU cannot be idle \n\tAnd In Q2 Highest priority is 20 and lowest priority is 11\n\n";
+	cout<<"NOTE:\n\tAnd In Q2 Highest priority is 20 and lowest priority is 11\n\nQ3>Q2>Q1 priority\n\n";
 	int n;
 	cout<<"Enter how many Process do you want :";
 	cin>>n;
-	int p[n],burst[n],arr[n],obj1save[n],obj2save[n],obj3save[n];
+	if(n<=0)
+	{
+		  cout<<"\nInvalid input";
+		  exit(0);
+	}
+	else{
+		int p[n],burst[n],burst1[n],arr[n],arr1[n],obj1save[n],obj2save[n],obj3save[n];
 	struct Processes obj1[n],obj2[n],obj3[n];
 	for(int i=0;i<n;i++)
 	{
@@ -34,18 +40,10 @@ int main()
 		cin>>burst[i];
 		cout<<"Enter Arrival Time of process :";
 		cin>>arr[i];
+		arr1[i]=arr[i];
+		burst1[i]=burst[i];
+		
 	}
-	for(int y=0;y<n;y++)
-	{
-		if(arr[y]==0)
-		    g++;
-	}
-	if(g==0)
-	{
-		cout<<"\n\n\t\tCPU is idle at time 0";
-	}
-	else
-	{
 	k[1]=0;k[2]=0;k[3]=0;
 	for(int i=0;i<n;i++)
 	{
@@ -72,12 +70,12 @@ int main()
 			  obj3[k[3]].processid=i+1; 
 		      obj3[k[3]].priority=p[i];
 		      obj3[k[3]].burstT=burst[i];
-		      obj2save[k[2]]=obj2[k[2]].burstT;
+		      obj3save[k[3]]=obj3[k[3]].burstT;
 		      obj3[k[3]].arrival=arr[i];
 		      k[3]++;
 			  }     
 	}
-	cout<<"\nQ1---Lowest priority range Queue ("<<k[1]<<" Process)\t(FIFO)\n";
+	cout<<"\nQ1---Lowest priority range Queue ("<<k[1]<<" Process)\t(FIFS)\n";
 	if(k[1]==0)
 		cout<<"No process in this priority range 0-5\n\n";
 	else
@@ -109,7 +107,24 @@ int main()
 		 {
 		 	 cout<<obj3[j].processid<<"\t"<<obj3[j].priority<<"\t\t"<<obj3[j].arrival<<"\t"<<obj3[j].burstT<<"\n";
 		}	
-	}  
+	} 
+		 int c3=0,c4=0;
+	  for(int u=0;u<n;u++)
+	{
+		for(int r=u;r<n;r++)
+		{
+		    if(arr1[u]>arr1[r])
+		    {
+		    	c3=arr1[u];
+		    	c4=burst1[u];
+		    	arr1[u]=arr1[r];
+		    	burst1[u]=burst1[r];
+		    	arr1[r]=c3;
+		    	burst1[r]=c4;
+		    }
+		}
+	}
+	int min=arr1[0];
 	int o=0;
 	int m,t=0,imp=0,Queuecount=0,Qsize=0,flag[k[1]],flag1[k[2]],flag2[k[3]],sig=0,sig1=0,sig2=0;
 	int Q[3];
@@ -168,11 +183,17 @@ int main()
 		    		            	obj3[r]=c2;
 		    		         }
 				             }
-				}			
-	cout<<"\n\nSHEDULING :(please wait(10 sec) after gantt chat to see turnaround time and waiting time of each process)\n\n";
-	int pro=0,pro1=0,pro2=0;
-	while(t<=90)
-	{	
+				}							
+	cout<<"\n\nSHEDULING :(please wait(20 sec) after gantt chat to see turnaround time and waiting time of each process)\n\n";
+	int pro=0,pro1=0,pro2=0,cy=0;
+	t=min;
+	int k1=k[1];
+	int k2=k[2];
+	int k3=k[3];
+	while(t<=200)
+	{
+	int bur=0;
+	int min1=100;	
     if(Q[imp]==0)
 	{
 		for(int m=0;m<3;m++)
@@ -194,8 +215,8 @@ int main()
 		case 2:
 		    {
 		    	//Lowest priority range Queue
+		    	 int e=t+10;
 		    	int count=0;	
-        	    int e=t+10;
         	    if(k[1]==0){
         	    	Q[2]=0;
         	    	break;
@@ -203,6 +224,35 @@ int main()
         	  else{
            	  while(t<=e)
 	          {		
+	               min1=obj1[pro].arrival;
+					   cy=0;
+					   for(int u=0;u<n;u++)
+	                 {
+								if(obj1[pro].arrival!=arr1[u])
+								{
+									cy++;
+								}
+								else
+								 break;
+		                }
+		                if((cy>k[1] && Q[1]!=0))
+		                {
+		                	if(cy>k[1] && Q[0]!=0)
+		                	   break;
+						}
+	              for(int u=0;u<=cy;u++)
+	                 {
+								if(arr1[u]>=(t+bur))
+		                       {
+			                         if(min1>=arr1[u])
+		                             {
+                                         min1=arr1[u];
+		    	                           t=min1;
+		                             }
+			
+		                         }
+		                }
+             		  int e=t+10;
 	              if(flag[pro]==0)
 				  {
 		          for(int m=0;m<k[1];m++)
@@ -220,6 +270,7 @@ int main()
 	              }
 	              else
 	              {	
+	                   
 	                   obj1[pro].waittime+=(t-obj1[pro].waittime);
 	                   if(obj1[pro].arrival>t)
 					   {
@@ -251,7 +302,7 @@ int main()
 					      obj1[pro].burstT-=10;
 					   }   
              		  }
-             		  if(sig==k[1])
+             		  if(sig==k1)
              		  { break;
 					   }
              		    sleep(1);
@@ -265,14 +316,44 @@ int main()
 	    case 1:
 		    {
 		    	//Middle priority range Queue
-		    	int count=0;
 		    	 int e=t+10;
+		    	int count=0;
         	  if(k[2]==0){
         	  	Q[1]=0;
 			  }
         	  else{
            	  while(t<=e)
 	          {		
+	              min1=obj2[pro1].arrival;
+					   cy=0;
+					   for(int u=0;u<n;u++)
+	                 {
+								if(obj2[pro1].arrival!=arr1[u])
+								{
+									cy++;
+								}
+								else
+								 break;
+		                }
+		                if((cy>k[2] && Q[0]!=0))
+		                {
+		                	if(cy>k[2] && Q[2]!=0)
+		                	   break;
+						}
+	              for(int u=0;u<=cy;u++)
+	                 {
+								if(arr1[u]>=(t+bur))
+		                       {
+			                         if(min1>=arr1[u])
+		                             {
+                                         min1=arr1[u];
+		    	                           t=min1;
+		                             }
+			
+		                         }
+		                }
+             		 int e=t+10;
+	        
 	              if(flag1[pro1]==0)
 				  {
 		          for(int m=0;m<k[2];m++)
@@ -298,7 +379,6 @@ int main()
 						} 
 	                  else if(obj2[pro1].arrival<=t)
 	                   {
-	                  int QTime=10;
              		   int remtime=obj2[pro1].burstT;
              		   if(t+remtime>e && remtime>0)
              		   {
@@ -326,7 +406,7 @@ int main()
 					   }    	    
 	              
 	              }}
-	              if(sig1==k[2])
+	              if(sig1==k2)
              		  { break;
 					   }
 	                sleep(1);
@@ -340,14 +420,44 @@ int main()
 		case 0:
 			{
 				//Highest priority range Queue
+				 int e=t+10;
 			  int count=0;	
-         	  int e=t+10;
         	  if(k[3]==0){
         	  	Q[0]=0;
 			  }
         	  else{
            	  while(t<=e)
 	          {		
+	              min1=obj3[pro2].arrival;
+					   cy=0;
+					   for(int u=0;u<n;u++)
+	                 {
+								if(obj3[pro2].arrival!=arr1[u])
+								{
+									cy++;
+								}
+								else
+								 break;
+		                }
+		                if((cy>k[3] && Q[1]!=0))
+		                {
+		                	if(cy>k[3] && Q[2]!=0)
+		                	   break;
+						}
+	              for(int u=0;u<=cy;u++)
+	                 {
+								if(arr1[u]>=(t+bur))
+		                       {
+			                         if(min1>=arr1[u])
+		                             {
+                                         min1=arr1[u];
+		    	                           t=min1;
+		                             }
+			
+		                         }
+		                }
+             		 
+	              int e=t+10;
 	              if(flag2[pro2]==0)
 				  {
 		          for(int m=0;m<k[3];m++)
@@ -398,7 +508,7 @@ int main()
 	     					 t+=timeq;
        					}
                         }}
-                        if(sig2==k[3])
+                        if(sig2==k3)
              		   { break;
 					   }
                         sleep(1);
@@ -417,58 +527,46 @@ int main()
  
 imp++;
 imp=imp%3;
-}
+
+for(int u=0;u<n;u++)
+	{
+		    if(arr1[u]<t)
+		    {
+		    	bur+=burst1[u];
+		    }
+	}
+	
+
+		    
+	}
+	
+	
+
 cout<<"\n";
 for(int j=0;j<k[1];j++)
 {   
     cout<<"\n\nQ1:p"<<obj1[j].processid<<"\n";
-    if(j!=0){
-
-		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)<<" sec\n";
-		cout<<"Turnaround time\tp"<<"= "<<((obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)+obj1save[j])<<" sec\n";
-		avgw+=(obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival);
-		avgt+=((obj1[j].waittime-obj1[j-1].arrival-obj1[j].arrival)+obj1save[j]);
-		}
-		else{
-		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<(obj1[j].waittime+obj1save[j])<<" sec\n";
-		avgw+=(obj1[j].waittime);
-		avgt+=(obj1[j].waittime+obj1save[j]);
-		}
+		cout<<"Waiting Time\t"<<"= "<<(obj1[j].waittime-min-(obj1[j].arrival-min))<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<(obj1[j].waittime-min-(obj1[j].arrival-min))+obj1save[j]<<" sec\n";
+		avgw+=(obj1[j].waittime-min-(obj1[j].arrival-min));
+		avgt+=(obj1[j].waittime-min-(obj1[j].arrival-min))+obj1save[j];
+		
 }
 for(int j=0;j<k[2];j++)
 {   
     cout<<"\n\nQ2:p"<<obj2[j].processid<<"\n";
-    if(j!=0){
-
-		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<((obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)+obj2save[j])<<" sec\n";
-		avgw+=(obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival);
-		avgt+=((obj2[j].waittime-obj2[j-1].arrival-obj2[j].arrival)+obj2save[j]);
-		}
-		else{
-		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<(obj2[j].waittime+obj2save[j])<<" sec\n";
-		avgw+=(obj2[j].waittime);
-		avgt+=(obj2[j].waittime+obj2save[j]);
-		}
+		cout<<"Waiting Time\t"<<"= "<<(obj2[j].waittime-min-(obj2[j].arrival-min))<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<(obj2[j].waittime-min-(obj2[j].arrival-min))+obj2save[j]<<" sec\n";
+		avgw+=(obj2[j].waittime-min-(obj2[j].arrival-min));
+		avgt+=(obj2[j].waittime-min-(obj2[j].arrival-min))+obj2save[j];
 }
 for(int j=0;j<k[3];j++)
 {   
-    cout<<"\n\nQ3:p"<<obj3[j].processid<<"\n";
-    if(j!=0){
-
-		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)<<" sec\n";
-		cout<<"Turnaround time\t"<<"="<<((obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)+obj3save[j])<<" sec\n";
-		avgw+=(obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival);
-		avgt+=((obj3[j].waittime-obj3[j-1].arrival-obj3[j].arrival)+obj3save[j]);
-		}
-		else{
-		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime)<<" sec\n";
-		cout<<"Turnaround time\t"<<"= "<<(obj3[j].waittime+obj3save[j])<<" sec\n";
-		avgw+=(obj3[j].waittime);
-		avgt+=(obj3[j].waittime+obj3save[j]);
-		}
+    cout<<"\n\nQ2:p"<<obj3[j].processid<<"\n";
+		cout<<"Waiting Time\t"<<"= "<<(obj3[j].waittime-min-(obj3[j].arrival-min))<<" sec\n";
+		cout<<"Turnaround time\t"<<"= "<<(obj3[j].waittime-min-(obj3[j].arrival-min))+obj3save[j]<<" sec\n";
+		avgw+=(obj3[j].waittime-min-(obj3[j].arrival-min));
+		avgt+=(obj3[j].waittime-min-(obj3[j].arrival-min))+obj3save[j];
 }
 cout<<"\nAverage waiting time : "<<(avgw/n)<<" sec\n";
 cout<<"\nAverage Turnaround time : "<<(avgt/n)<<" sec\n";
